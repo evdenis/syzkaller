@@ -33,6 +33,7 @@ const (
 	tokEq
 	tokComma
 	tokColon
+	tokDash
 
 	tokEOF
 )
@@ -48,6 +49,7 @@ var punctuation = [256]token{
 	'=':  tokEq,
 	',':  tokComma,
 	':':  tokColon,
+	'-':  tokDash,
 }
 
 var tok2str = [...]string{

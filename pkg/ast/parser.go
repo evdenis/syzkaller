@@ -420,8 +420,10 @@ func (p *parser) parseType() *Type {
 	case tokString:
 		arg.String = p.lit
 		arg.HasString = true
+	case tokDash:
+		allowColon = true
 	default:
-		p.expect(tokInt, tokIdent, tokString)
+		p.expect(tokInt, tokIdent, tokString, tokDash)
 	}
 	p.next()
 	if allowColon && p.tryConsume(tokColon) {
@@ -432,8 +434,9 @@ func (p *parser) parseType() *Type {
 			arg.Value2, arg.value2Fmt = p.parseIntValue()
 		case tokIdent:
 			arg.Ident2 = p.lit
+		case tokDash:
 		default:
-			p.expect(tokInt, tokIdent)
+			p.expect(tokInt, tokIdent, tokDash)
 		}
 		p.next()
 	}
