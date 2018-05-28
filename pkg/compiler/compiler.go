@@ -326,9 +326,14 @@ func (comp *compiler) parseIntType(name string) (size uint64, bigEndian bool) {
 	if be {
 		name = name[:len(name)-len("be")]
 	}
+	unsigned := strings.HasPrefix(name, "u")
+	start_pos := 3
+	if unsigned {
+		start_pos := 4
+	}
 	size = comp.ptrSize
-	if name != "intptr" {
-		size, _ = strconv.ParseUint(name[3:], 10, 64)
+	if name != "intptr" && name != "uintptr" {
+		size, _ = strconv.ParseUint(name[start_pos:], 10, 64)
 		size /= 8
 	}
 	return size, be
