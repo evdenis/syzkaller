@@ -704,8 +704,8 @@ github.com/apache/arrow/go/v11 v11.0.0/go.mod h1:Eg5OsL5H+e299f7u5ssuXsuHQVEGC4x
 github.com/apache/arrow/go/v15 v15.0.2 h1:60IliRbiyTWCWjERBCkO1W4Qun9svcYoZrSLcyOsMLE=
 github.com/apache/arrow/go/v15 v15.0.2/go.mod h1:DGXsR3ajT524njufqf95822i+KTh+yea1jass9YXgjA=
 github.com/apache/thrift v0.16.0/go.mod h1:PHK3hniurgQaNMZYaCLEqXKsYK8upmhPbmdP2FXSqgU=
-github.com/argoproj/argo-workflows/v3 v3.7.3 h1:b0o03RTLXIL7lQunDEvLoDTeI5TbfXe2obGaItvvifk=
-github.com/argoproj/argo-workflows/v3 v3.7.3/go.mod h1:beyGAfZUKfTetics0/Ek55PYcl4ZJ4w4+vQB/wxN4qI=
+github.com/argoproj/argo-workflows/v3 v3.7.4 h1:oA/DxaSsjb6fMYaygf7JVQgnsF+ZzlfUPy5kIfLsCic=
+github.com/argoproj/argo-workflows/v3 v3.7.4/go.mod h1:magZx49kuH3RHLpkKf3HUCtUDVjFIEHV/cUn5G6D1QE=
 github.com/ashanbrown/forbidigo/v2 v2.1.0 h1:NAxZrWqNUQiDz19FKScQ/xvwzmij6BiOw3S0+QUQ+Hs=
 github.com/ashanbrown/forbidigo/v2 v2.1.0/go.mod h1:0zZfdNAuZIL7rSComLGthgc/9/n2FqspBOH90xlCHdA=
 github.com/ashanbrown/makezero/v2 v2.0.1 h1:r8GtKetWOgoJ4sLyUx97UTwyt2dO7WkGFHizn/Lo8TY=
