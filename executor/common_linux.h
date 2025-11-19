@@ -874,15 +874,18 @@ static void initialize_devlink_pci(void)
 #if SYZ_EXECUTOR || SYZ_WIFI || __NR_syz_80211_inject_frame || __NR_syz_80211_join_ibss
 
 #define WIFI_INITIAL_DEVICE_COUNT 2
-#define WIFI_MAC_BASE \
-	{             \
-	    0x08, 0x02, 0x11, 0x00, 0x00, 0x00}
-#define WIFI_IBSS_BSSID \
-	{               \
-	    0x50, 0x50, 0x50, 0x50, 0x50, 0x50}
-#define WIFI_IBSS_SSID \
-	{              \
-	    0x10, 0x10, 0x10, 0x10, 0x10, 0x10}
+#define WIFI_MAC_BASE                              \
+	{                                          \
+		0x08, 0x02, 0x11, 0x00, 0x00, 0x00 \
+	}
+#define WIFI_IBSS_BSSID                            \
+	{                                          \
+		0x50, 0x50, 0x50, 0x50, 0x50, 0x50 \
+	}
+#define WIFI_IBSS_SSID                             \
+	{                                          \
+		0x10, 0x10, 0x10, 0x10, 0x10, 0x10 \
+	}
 #define WIFI_DEFAULT_FREQUENCY 2412
 #define WIFI_DEFAULT_SIGNAL 0
 #define WIFI_DEFAULT_RX_RATE 1
