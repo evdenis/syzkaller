@@ -1,0 +1,166 @@
+# Copyright 2025 syzkaller project authors. All rights reserved.
+# Use of this source code is governed by Apache 2 LICENSE that can be found in the LICENSE file.
+
+# VirtualBox Guest Additions Driver Interface
+# https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/virt/vboxguest
+# https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/vboxguest.h
+
+meta arches["386", "amd64", "arm", "arm64"]
+
+include <uapi/linux/fcntl.h>
+include <uapi/linux/vboxguest.h>
+include <uapi/linux/vbox_vmmdev_types.h>
+include <uapi/linux/vbox_err.h>
+
+resource fd_vboxguest[fd]
+resource vboxguest_hgcm_client_id[int32]
+
+# Device open
+openat$vboxguest(fd const[AT_FDCWD], file ptr[in, string["/dev/vboxguest"]], flags flags[open_flags], mode const[0]) fd_vboxguest
+
+# Driver version info
+ioctl$VBGL_IOCTL_DRIVER_VERSION_INFO(fd fd_vboxguest, cmd const[VBG_IOCTL_DRIVER_VERSION_INFO], arg ptr[inout, vbg_ioctl_driver_version_info])
+
+vbg_ioctl_driver_version_info {
+	hdr		vbg_ioctl_hdr_in
+	req_version	const[0x10000, int32]
+	min_version	const[0x10000, int32]
+	reserved1	const[0, int32]
+	reserved2	const[0, int32]
+}
+
+vbg_ioctl_hdr_in {
+	size_in		len[parent, int32]
+	version		const[0x10001, int32]
+	type		const[0, int32]
+	rc		const[0, int32]
+	size_out	const[0, int32]
+	reserved	const[0, int32]
+}
+
+# HGCM (Host-Guest Communication Mechanism)
+ioctl$VBGL_IOCTL_HGCM_CONNECT(fd fd_vboxguest, cmd const[VBG_IOCTL_HGCM_CONNECT], arg ptr[inout, vbg_ioctl_hgcm_connect])
+ioctl$VBGL_IOCTL_HGCM_DISCONNECT(fd fd_vboxguest, cmd const[VBG_IOCTL_HGCM_DISCONNECT], arg ptr[inout, vbg_ioctl_hgcm_disconnect])
+ioctl$VBGL_IOCTL_HGCM_CALL(fd fd_vboxguest, cmd const[VBG_IOCTL_HGCM_CALL_64], arg ptr[inout, vbg_ioctl_hgcm_call])
+ioctl$VBGL_IOCTL_HGCM_CALL_32(fd fd_vboxguest, cmd const[VBG_IOCTL_HGCM_CALL_32], arg ptr[inout, vbg_ioctl_hgcm_call_32])
+
+vbg_ioctl_hgcm_connect {
+	hdr		vbg_ioctl_hdr_in
+	loc		vmmdev_hgcm_service_location
+}
+
+vmmdev_hgcm_service_location {
+	type		flags[vmmdev_hgcm_service_location_type, int32]
+	service_name	array[int8, 128]
+}
+
+vbg_ioctl_hgcm_disconnect {
+	hdr		vbg_ioctl_hdr_in
+	client_id	vboxguest_hgcm_client_id
+}
+
+vbg_ioctl_hgcm_call {
+	hdr		vbg_ioctl_hdr_in
+	client_id	vboxguest_hgcm_client_id
+	function	int32
+	timeout_ms	int32[0:10000]
+	interruptible	int8
+	reserved	const[0, int8]
+	parm_count	len[parms, int16]
+	parms		array[vmmdev_hgcm_function_parameter64, 0:16]
+}
+
+vbg_ioctl_hgcm_call_32 {
+	hdr		vbg_ioctl_hdr_in
+	client_id	vboxguest_hgcm_client_id
+	function	int32
+	timeout_ms	int32[0:10000]
+	interruptible	int8
+	reserved	const[0, int8]
+	parm_count	len[parms, int16]
+	parms		array[vmmdev_hgcm_function_parameter32, 0:16]
+}
+
+vmmdev_hgcm_function_parameter64 {
+	type	flags[vmmdev_hgcm_function_parameter_type, int32]
+	value32	int32
+	value64	int64
+}
+
+vmmdev_hgcm_function_parameter32 {
+	type	flags[vmmdev_hgcm_function_parameter_type, int32]
+	value32	int32
+	value64	int64
+}
+
+# Log messages
+ioctl$VBGL_IOCTL_LOG(fd fd_vboxguest, cmd const[VBG_IOCTL_LOG], arg ptr[in, vbg_ioctl_log])
+
+vbg_ioctl_log {
+	hdr	vbg_ioctl_hdr_in
+	msg	array[int8, 0:256]
+}
+
+# Event handling
+ioctl$VBGL_IOCTL_WAIT_FOR_EVENTS(fd fd_vboxguest, cmd const[VBG_IOCTL_WAIT_FOR_EVENTS], arg ptr[inout, vbg_ioctl_wait_for_events])
+ioctl$VBGL_IOCTL_INTERRUPT_ALL_WAIT_FOR_EVENTS(fd fd_vboxguest, cmd const[VBG_IOCTL_INTERRUPT_ALL_WAIT_FOR_EVENTS], arg ptr[inout, vbg_ioctl_hdr_in])
+
+vbg_ioctl_wait_for_events {
+	hdr		vbg_ioctl_hdr_in
+	timeout_ms	int32[0:10000]
+	events		flags[vmmdev_event_types, int32]
+}
+
+# Event filter mask
+ioctl$VBGL_IOCTL_CHANGE_FILTER_MASK(fd fd_vboxguest, cmd const[VBG_IOCTL_CHANGE_FILTER_MASK], arg ptr[inout, vbg_ioctl_change_filter])
+
+vbg_ioctl_change_filter {
+	hdr		vbg_ioctl_hdr_in
+	or_mask		flags[vmmdev_event_types, int32]
+	not_mask	flags[vmmdev_event_types, int32]
+}
+
+# Guest capabilities
+ioctl$VBGL_IOCTL_ACQUIRE_GUEST_CAPABILITIES(fd fd_vboxguest, cmd const[VBG_IOCTL_ACQUIRE_GUEST_CAPABILITIES], arg ptr[inout, vbg_ioctl_acquire_guest_caps])
+ioctl$VBGL_IOCTL_CHANGE_GUEST_CAPABILITIES(fd fd_vboxguest, cmd const[VBG_IOCTL_CHANGE_GUEST_CAPABILITIES], arg ptr[inout, vbg_ioctl_set_guest_caps])
+
+vbg_ioctl_acquire_guest_caps {
+	hdr		vbg_ioctl_hdr_in
+	flags		flags[vbgl_ioc_agc_flags, int32]
+	or_mask		flags[vmmdev_guest_caps, int32]
+	not_mask	flags[vmmdev_guest_caps, int32]
+}
+
+vbg_ioctl_set_guest_caps {
+	hdr		vbg_ioctl_hdr_in
+	or_mask		flags[vmmdev_guest_caps, int32]
+	not_mask	flags[vmmdev_guest_caps, int32]
+}
+
+# Memory balloon
+ioctl$VBGL_IOCTL_CHECK_BALLOON(fd fd_vboxguest, cmd const[VBG_IOCTL_CHECK_BALLOON], arg ptr[inout, vbg_ioctl_check_balloon])
+
+vbg_ioctl_check_balloon {
+	hdr	vbg_ioctl_hdr_in
+}
+
+# Core dump
+ioctl$VBGL_IOCTL_WRITE_CORE_DUMP(fd fd_vboxguest, cmd const[VBG_IOCTL_WRITE_CORE_DUMP], arg ptr[inout, vbg_ioctl_write_coredump])
+
+vbg_ioctl_write_coredump {
+	hdr	vbg_ioctl_hdr_in
+	flags	const[0, int32]
+}
+
+# Constants - these will be extracted from kernel headers
+vmmdev_hgcm_service_location_type = VMMDEV_HGCM_LOC_LOCALHOST, VMMDEV_HGCM_LOC_LOCALHOST_EXISTING
+
+vmmdev_hgcm_function_parameter_type = VMMDEV_HGCM_PARM_TYPE_32BIT, VMMDEV_HGCM_PARM_TYPE_64BIT, VMMDEV_HGCM_PARM_TYPE_LINADDR, VMMDEV_HGCM_PARM_TYPE_LINADDR_IN, VMMDEV_HGCM_PARM_TYPE_LINADDR_OUT
+
+# Event types (bit flags from vmmdev.h)
+vmmdev_event_types = 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
+
+# Guest capabilities (bit flags from vmmdev.h)
+vmmdev_guest_caps = 1, 2, 4
+
+vbgl_ioc_agc_flags = 0, 1
